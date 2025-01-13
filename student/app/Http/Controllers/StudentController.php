@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Support\Facades\Http; // Utilisation de HTTP client Laravel
+use GuzzleHttp\Client;
 
 
 class StudentController extends Controller
@@ -17,15 +19,24 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
+        // Validation de base
         $request->validate([
             'name' => 'required|string|max:255',
             'genre' => 'required|string',
-            'school_id' => 'required|exists:schools,id', // Assurez-vous que l'école existe
+            'school_id' => 'required|integer', 
         ]);
+
+        $client = new Client();
+        $response = $client->get("http://127.0.0.1:8000/api/schools/{$request->school_id}");
+
+        if ($response->getStatusCode() != 200) {
+            return response()->json(['error' => 'The selected school id is invalid.'], 400);
+        }
 
         $student = Student::create($request->all());
         return response()->json($student, 201);
     }
+
 
     public function show($id)
     {
