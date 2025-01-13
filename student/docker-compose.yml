@@ -1,0 +1,21 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27018:27017"  # Lier le port 27018 (hôte) au port 27017 (conteneur)
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
