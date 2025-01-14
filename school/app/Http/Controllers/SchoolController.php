@@ -22,7 +22,12 @@ class SchoolController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'director_name' => 'required|string|max:255',
+        ], [
+            'name.required' => 'Le nom de l\'école est requis.',
+            'address.required' => 'L\'adresse de l\'école est requise.',
+            'director_name.required' => 'Le nom du directeur est requis.',
         ]);
+        
 
         // Créer une nouvelle école avec les données validées
         $school = School::create($request->all());
