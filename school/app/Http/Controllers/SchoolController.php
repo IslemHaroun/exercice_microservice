@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\School;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
 class SchoolController extends Controller
 {
@@ -56,5 +57,27 @@ class SchoolController extends Controller
         $school = School::findOrFail($id);
         $school->delete();
         return response()->json(null, 204);
+    }
+
+    public function getStudentsBySchool($school_id)
+    {
+        // Créer une instance de Guzzle pour envoyer une requête HTTP au microservice des étudiants
+        $client = new Client();
+
+        try {
+            // Effectuer une requête GET vers le microservice des étudiants
+            $response = $client->get("http://127.0.0.1:8001/api/students/school/{$school_id}");
+
+            // Vérifier si la réponse est valide
+            if ($response->getStatusCode() == 200) {
+                $students = json_decode($response->getBody()->getContents(), true);
+                return response()->json($students);
+            }
+
+            return response()->json(['error' => 'Unable to fetch students'], 500);
+        } catch (\Exception $e) {
+            // En cas d'erreur dans la requête, retourner une erreur
+            return response()->json(['error' => 'Error connecting to student service: ' . $e->getMessage()], 500);
+        }
     }
 }

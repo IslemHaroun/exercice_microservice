@@ -1,0 +1,73 @@
+
+services:
+  # PostgreSQL Service
+  postgres:
+    image: postgres
+    container_name: db
+    restart: always
+    ports:
+      - "5450:5432"
+    environment:
+      POSTGRES_USER: islem
+      POSTGRES_PASSWORD: password
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # PgAdmin Service
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: islemharoun@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - backend
+
+  # MongoDB Service
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27018:27017"  # Lier le port 27018 (hôte) au port 27017 (conteneur)
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+
+  # Mongo Express Service
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"  # Accès à mongo-express via http://localhost:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpassword
+    networks:
+      - backend
+
+volumes:
+  local_pgdata:
+    driver: local
+  pgadmin_data:
+    driver: local
+  mongo_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
