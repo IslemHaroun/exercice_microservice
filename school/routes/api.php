@@ -16,3 +16,8 @@ Route::get('schools/{id}', [SchoolController::class, 'show']);
 Route::put('schools/{id}', [SchoolController::class, 'update']);  
 Route::delete('schools/{id}', [SchoolController::class, 'destroy']);
 Route::get('schools/{school_id}/students', [SchoolController::class, 'getStudentsBySchool']);
+
+// check health of services
+Route::get('/health', function () {
+    return response()->json(['status' => 'healthy'], 200);
+});

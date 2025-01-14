@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Services\ConsulService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        ConsulService::registerService(
+            'student-service', 
+            'student-service-id',
+            8001,
+            'student',
+            'http://student:8001/health'
+        );
     }
 }
