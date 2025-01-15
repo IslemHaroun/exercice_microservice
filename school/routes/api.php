@@ -18,6 +18,13 @@ Route::delete('schools/{id}', [SchoolController::class, 'destroy']);
 Route::get('schools/{school_id}/students', [SchoolController::class, 'getStudentsBySchool']);
 
 // check health of services
+// Route::get('/health', function () {
+//     return response()->json(['status' => 'healthy'], 200);
+// });
 Route::get('/health', function () {
-    return response()->json(['status' => 'healthy'], 200);
+    return response()->json([
+        'status' => 'healthy',
+        'service' => 'school',
+        'timestamp' => now()
+    ]);
 });
