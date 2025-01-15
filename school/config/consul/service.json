@@ -1,0 +1,11 @@
+{
+    "service": {
+      "name": "school",
+      "port": 8002,
+      "tags": ["laravel", "api"],
+      "check": {
+        "http": "http://localhost:8002/api/health",
+        "interval": "10s"
+      }
+    }
+  }

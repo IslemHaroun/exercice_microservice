@@ -72,6 +72,52 @@ services:
     networks:
       - backend
 
+  # School Service
+  school:
+    build:
+      context: ./school
+      dockerfile: Dockerfile
+    container_name: school
+    restart: always
+    ports:
+      - "8002:8000"
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul:8500
+    networks:
+      - backend
+    depends_on:
+      - consul
+    labels:
+      - "consul.tags=school"
+      - "consul.service.name=school"
+      - "consul.service.port=8000"
+      - "consul.service.address=school"
+    command: >
+      sh -c "sleep 10 && consul services register -name=school -port=8000 -address=school"
+
+  # Student Service
+  student:
+    build:
+      context: ./student
+      dockerfile: Dockerfile
+    container_name: student
+    restart: always
+    ports:
+      - "8001:8000"
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul:8500
+    networks:
+      - backend
+    depends_on:
+      - consul
+    labels:
+      - "consul.tags=student"
+      - "consul.service.name=student"
+      - "consul.service.port=8000"
+      - "consul.service.address=student"
+    command: >
+      sh -c "sleep 10 && consul services register -name=student -port=8000 -address=student"
+
 volumes:
   local_pgdata:
     driver: local

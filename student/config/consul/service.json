@@ -1,0 +1,11 @@
+{
+    "service": {
+      "name": "student",
+      "port": 8001,
+      "tags": ["laravel", "api"],
+      "check": {
+        "http": "http://localhost:8001/api/health",
+        "interval": "10s"
+      }
+    }
+  }
