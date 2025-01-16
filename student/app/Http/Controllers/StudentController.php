@@ -5,8 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Illuminate\Support\Facades\Http; // Utilisation de HTTP client Laravel
+use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
+use MongoDB\BSON\UTCDateTime;  // Ajoutez cette ligne
+use MongoDB\Client as MongoClient;  // Ajoutez cette ligne
+use Carbon\Carbon;
+
 
 
 class StudentController extends Controller
@@ -19,24 +24,40 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        // Validation de base
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'genre' => 'required|string',
-            'school_id' => 'required|integer', 
-        ]);
+        Log::info('Début de la requête store');
 
-        $client = new Client();
-        $response = $client->get("http://127.0.0.1:8000/api/schools/{$request->school_id}");
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'genre' => 'required|string',
+                'school_id' => 'required|integer',
+            ]);
 
-        if ($response->getStatusCode() != 200) {
-            return response()->json(['error' => 'The selected school id is invalid.'], 400);
+            Log::info('Test de création student...');
+
+            $student = Student::create([
+                'name' => $request->name,
+                'genre' => $request->genre,
+                'school_id' => $request->school_id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            Log::info('Student créé avec succès', ['student' => $student]);
+
+            return response()->json($student, 201);
+        } catch (\Exception $e) {
+            Log::error('Erreur:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response()->json([
+                'error' => 'Erreur lors de la création',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        $student = Student::create($request->all());
-        return response()->json($student, 201);
     }
-
 
     public function show($id)
     {

@@ -80,15 +80,16 @@ return [
 
 
         'mongodb' => [
-            'driver'   => 'mongodb',
-            'host'     => env('DB_HOST', 'localhost'),
-            'port'     => env('DB_PORT', 27017),
+            'driver' => 'mongodb',
+            'host' => env('DB_HOST', 'mongo'),
+            'port' => env('DB_PORT', 27017),
             'database' => env('DB_DATABASE', 'db_mongo_service'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', 'rootpassword'),
-            'options'  => [
-                'database' => env('DB_AUTHENTICATION_DATABASE', 'admin')
-            ]
+            'options' => [
+                'authMechanism' => 'SCRAM-SHA-1',
+                'authSource' => 'admin'
+            ],
         ],
 
 

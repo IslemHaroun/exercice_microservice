@@ -1,19 +1,21 @@
 FROM php:8.2-fpm
 
-# Installation des dépendances de base
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     libonig-dev \
     libzip-dev \
+    zip \
+    curl \
     unzip \
     git \
-    curl \
     wget \
     netcat-openbsd \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql gd zip
+    libssl-dev \  
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip
 
 # Installation de MongoDB
 RUN pecl install mongodb && docker-php-ext-enable mongodb
@@ -38,12 +40,18 @@ RUN chown -R www-data:www-data /var/www/html \
 # Création du répertoire pour la configuration Consul
 RUN mkdir -p /consul/config
 
+# Téléchargement du script wait-for-it
+RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /wait-for-it.sh \
+    && chmod +x /wait-for-it.sh
+
 EXPOSE 8000
 
-# Modification du CMD pour utiliser un script de démarrage
+# Modification du CMD pour utiliser un script de démarrage avec wait-for-it
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-CMD ["docker-entrypoint.sh"]
 
 COPY start.sh .
 RUN chmod +x start.sh
+
+# Exécution du script wait-for-it et démarrage de l'application
+CMD ["/wait-for-it.sh", "school:8002", "--", "/usr/local/bin/docker-entrypoint.sh"]

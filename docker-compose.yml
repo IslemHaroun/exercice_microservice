@@ -35,8 +35,9 @@ services:
     image: mongo:latest
     container_name: mongo
     restart: always
+    command: mongod --setParameter authenticationMechanisms=SCRAM-SHA-1
     ports:
-      - "27018:27017"  # Lier le port 27018 (hôte) au port 27017 (conteneur)
+      - "27018:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=rootpassword
@@ -73,6 +74,7 @@ services:
     networks:
       - backend
 
+  # School Service
   school:
     build:
       context: ./school
@@ -80,19 +82,23 @@ services:
     container_name: school
     restart: always
     ports:
-      - "8002:8000"
+      - "8002:8000"  # Port externe:interne
     environment:
       - CONSUL_HTTP_ADDR=http://consul:8500
     networks:
       - backend
     depends_on:
       - consul
+      - postgres  # Ajout de la dépendance à postgres
     labels:
       - "consul.tags=school"
       - "consul.service.name=school"
       - "consul.service.port=8000"
       - "consul.service.address=school"
-    command: ["./start.sh"]
+    command: >
+      sh -c "sleep 10 && 
+             consul services register -name=school -port=8000 -address=school &&
+             php artisan serve --host=0.0.0.0 --port=8000"
 
   student:
     build:
@@ -104,16 +110,28 @@ services:
       - "8001:8000"
     environment:
       - CONSUL_HTTP_ADDR=http://consul:8500
+      - SCHOOL_SERVICE_URL=http://school:8000
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongo
+      - DB_PORT=27017
+      - DB_DATABASE=db_mongo_service
+      - DB_USERNAME=root
+      - DB_PASSWORD=rootpassword
     networks:
       - backend
     depends_on:
       - consul
+      - mongo
+      - school
     labels:
       - "consul.tags=student"
       - "consul.service.name=student"
       - "consul.service.port=8000"
       - "consul.service.address=student"
-    command: ["./start.sh"]
+    command: >
+      sh -c "sleep 10 && 
+             consul services register -name=student -port=8000 -address=student &&
+             php artisan serve --host=0.0.0.0 --port=8000"
 
 volumes:
   local_pgdata:
