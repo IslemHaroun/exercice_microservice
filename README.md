@@ -5,6 +5,12 @@ Ce projet est une architecture de microservices développée avec Laravel, impl�
 
 ---
 
+### Visualisation des Services dans Consul
+
+Voici une capture d'écran de l'interface **Consul**, affichant les services enregistrés et en cours d'exécution :
+
+![Services enregistrés dans Consul](./project//screenshots/display_consul_services.png)
+
 ## Technologies Utilisées
 
 ### Frameworks et Langages
