@@ -72,6 +72,7 @@ services:
     networks:
       - backend
 
+  # School Service
   school:
     build:
       context: ./school
@@ -91,8 +92,10 @@ services:
       - "consul.service.name=school"
       - "consul.service.port=8000"
       - "consul.service.address=school"
-    command: ["./start.sh"]
+    command: >
+      sh -c "sleep 10 && consul services register -name=school -port=8000 -address=school"
 
+  # Student Service
   student:
     build:
       context: ./student
@@ -112,7 +115,8 @@ services:
       - "consul.service.name=student"
       - "consul.service.port=8000"
       - "consul.service.address=student"
-    command: ["./start.sh"]
+    command: >
+      sh -c "sleep 10 && consul services register -name=student -port=8000 -address=student"
 
 volumes:
   local_pgdata:
