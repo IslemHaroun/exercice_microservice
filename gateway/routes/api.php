@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GatewayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+
+Route::any('schools/{path?}', [GatewayController::class, 'forwardToSchool'])
+    ->where('path', '.*');
+
+Route::any('students/{path?}', [GatewayController::class, 'forwardToStudent'])
+    ->where('path', '.*');
