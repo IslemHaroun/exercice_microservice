@@ -1,7 +1,7 @@
 # Documentation du Projet de Microservices
 
 ## Description du Projet
-Ce projet est une architecture de microservices développée avec Laravel, implémentant deux services principaux : **School** et **Student**. Le système utilise **Consul** pour la découverte de services et combine **PostgreSQL** et **MongoDB** comme bases de données.
+Ce projet est une architecture de microservices développée avec Laravel, implémentant trois services principaux : **School**, **Student** et **Gateway**. Le système utilise **Consul** pour la découverte de services et combine **PostgreSQL** et **MongoDB** comme bases de données.
 
 ---
 
@@ -10,6 +10,7 @@ Ce projet est une architecture de microservices développée avec Laravel, impl�
 ### Frameworks et Langages
 - **Laravel 11** (Service School)
 - **Laravel 10** (Service Student)
+- **Laravel** (Service Gateway)
 - **PHP 8.2**
 - **Docker** et **Docker Compose**
 
@@ -30,6 +31,7 @@ Ce projet est une architecture de microservices développée avec Laravel, impl�
 project/
 ├── school/              # Service School (Laravel 11)
 ├── student/             # Service Student (Laravel 10)
+├── gateway/             # Service Gateway (Laravel)
 └── docker-compose.yml   # Configuration Docker
 ```
 
@@ -39,6 +41,7 @@ project/
 
 - **School Service**: [http://localhost:8002](http://localhost:8002)
 - **Student Service**: [http://localhost:8001](http://localhost:8001)
+- **Gateway Service**: [http://localhost:8003](http://localhost:8003)
 - **Consul UI**: [http://localhost:8500](http://localhost:8500)
 - **PgAdmin**: [http://localhost:8888](http://localhost:8888)
 - **MongoDB Express**: [http://localhost:8081](http://localhost:8081)
@@ -83,6 +86,11 @@ project/
      DB_PASSWORD=rootpassword
      ```
 
+   - Pour le service **Gateway** (`.env`):
+     ```env
+     CONSUL_HTTP_ADDR=http://consul:8500
+     ```
+
 3. **Démarrer les services**
    ```bash
    docker-compose up -d
@@ -99,6 +107,11 @@ project/
    - Pour **Student**:
      ```bash
      docker-compose exec student composer install
+     ```
+
+   - Pour **Gateway**:
+     ```bash
+     docker-compose exec gateway composer install
      ```
 
 ---
@@ -150,6 +163,17 @@ project/
   curl http://localhost:8001/api/students
   ```
 
+### Service Gateway
+
+- **Proxy vers les autres services**
+  ```bash
+  curl http://localhost:8003/<service_endpoint>
+  ```
+  Exemple :
+  ```bash
+  curl http://localhost:8003/api/schools
+  ```
+
 ---
 
 ## Architecture et Communications
@@ -168,6 +192,7 @@ Pour tester les services, vous pouvez utiliser **Postman** ou **curl**. Les endp
 
 - **Schools**: [http://localhost:8002/api/schools](http://localhost:8002/api/schools)
 - **Students**: [http://localhost:8001/api/students](http://localhost:8001/api/students)
+- **Gateway**: [http://localhost:8003](http://localhost:8003)
 
 ---
 
@@ -177,6 +202,7 @@ Pour tester les services, vous pouvez utiliser **Postman** ou **curl**. Les endp
    ```bash
    docker-compose logs school
    docker-compose logs student
+   docker-compose logs gateway
    ```
 
 2. **Redémarrer les services**
@@ -195,4 +221,4 @@ Pour tester les services, vous pouvez utiliser **Postman** ou **curl**. Les endp
    - **MongoDB**:
      ```bash
      docker-compose exec mongo mongosh -u root -p rootpassword
-     
+     ```
