@@ -7,13 +7,19 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     libzip-dev \
+    libpq-dev \
+    postgresql \
+    postgresql-contrib \
     zip \
     curl \
     unzip \
     git \
     wget \
-    netcat-openbsd \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl
+    netcat-openbsd
+
+# Installation des extensions PHP
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql mbstring zip exif pcntl
 
 # Installation de Consul
 RUN wget https://releases.hashicorp.com/consul/1.20.2/consul_1.20.2_linux_amd64.zip \

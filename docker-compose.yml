@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_USER: islem
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: school_db
     volumes:
       - local_pgdata:/var/lib/postgresql/data
     networks:
